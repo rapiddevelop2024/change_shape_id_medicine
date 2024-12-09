@@ -1,0 +1,45 @@
+update trm.DRUG dsh
+set dsh.SHAPE_ID = 406
+where dsh.SERVICE_ITEM_ID in
+      (select si.id
+       from trm.SERVICE_ITEM si
+       where si.DISABLE_DATE is null
+         and si.CODE in
+             (select to_char(SERVICE_ITEM.CODE)
+              from com.WS_SENDING_RSPN
+                       join com.WS_SENDING_RSPN_LOG on WS_SENDING_RSPN.ID = WS_SENDING_RSPN_LOG.SND_RSPN_ID
+                       join cis.VISIT on VISIT.id = WS_SENDING_RSPN.SOURCE_ID
+                       join cis.ADMISSION on VISIT.ADMISSION_ID = ADMISSION.ID
+                       join org.INSURANCE_BOX on ADMISSION.INSURANCE_BOX_ID = INSURANCE_BOX.ID
+                       join cis.PRESCRIPTION on VISIT.ID = PRESCRIPTION.VISIT_ID
+                       join cis.PRESCRIPTION_ITEM on PRESCRIPTION.ID = PRESCRIPTION_ITEM.PRESCRIPTION_ID
+                       join trm.SERVICE_ITEM on PRESCRIPTION_ITEM.SERVICE_ITEM_ID = SERVICE_ITEM.ID
+                       join cis.ADMISSION on ADMISSION.id = VISIT.ADMISSION_ID
+                       join prs.NATURAL_PERSON on ADMISSION.EXPERT_PERSON_ID = NATURAL_PERSON.id
+                       join prs.PERSON patient on ADMISSION.PERSON_ID = patient.ID
+                       join trm.DRUG on SERVICE_ITEM.ID = DRUG.SERVICE_ITEM_ID
+                       join trm.DRUG_SHAPE on DRUG.SHAPE_ID = DRUG_SHAPE.ID
+              where WS_SENDING_RSPN.WS_SERVICE_ID = 71
+                and trunc(WS_SENDING_RSPN.CREATION_DATE) >= trunc(SYSDATe - 36000)
+                and RESPONSE_LOG like 'I/O error on POST request for "http://webapi.ihio.gov%'
+                and DRUG_SHAPE.id = 405
+                and SERVICE_ITEM.NAME like '-%'
+                and VISIT.id in (select VISIT.id
+                                 from com.WS_SENDING_RSPN
+                                          join com.WS_SENDING_RSPN_LOG
+                                               on WS_SENDING_RSPN.ID = WS_SENDING_RSPN_LOG.SND_RSPN_ID
+                                          join cis.VISIT on VISIT.id = WS_SENDING_RSPN.SOURCE_ID
+                                          join cis.ADMISSION on VISIT.ADMISSION_ID = ADMISSION.ID
+                                          join org.INSURANCE_BOX on ADMISSION.INSURANCE_BOX_ID = INSURANCE_BOX.ID
+                                          join cis.PRESCRIPTION on VISIT.ID = PRESCRIPTION.VISIT_ID
+                                          join cis.PRESCRIPTION_ITEM
+                                               on PRESCRIPTION.ID = PRESCRIPTION_ITEM.PRESCRIPTION_ID
+                                          join trm.SERVICE_ITEM on PRESCRIPTION_ITEM.SERVICE_ITEM_ID = SERVICE_ITEM.ID
+                                          join cis.ADMISSION on ADMISSION.id = VISIT.ADMISSION_ID
+                                          join prs.NATURAL_PERSON on ADMISSION.EXPERT_PERSON_ID = NATURAL_PERSON.id
+                                          join prs.PERSON patient on ADMISSION.PERSON_ID = patient.ID
+                                 where WS_SENDING_RSPN.WS_SERVICE_ID = 71
+                                   and trunc(WS_SENDING_RSPN.CREATION_DATE) >= trunc(SYSDATe - 36000)
+                                   and RESPONSE_LOG like 'I/O error on POST request for "http://webapi.ihio.gov%'
+                                   and SERVICE_ITEM.NAME like '-%'))); 
+ 
