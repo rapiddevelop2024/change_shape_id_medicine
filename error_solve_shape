@@ -1,0 +1,13 @@
+merge into trm.drug dr
+using (SELECT se.id FROm com.terminology t
+join com.term ct on t.id = ct.terminology_id
+join trm.service_item se on ct.id = se.term_id
+join trm.drug dr on dr.service_item_id = se.id
+join m_dehghan.backup_salamat_syrup_errors bu on bu.service_item_code = se.code
+where t.organization_id = 16
+and se.disable_date is null
+and dr.shape_id = 409
+and se.name not like '-%')h
+on (dr.service_item_id = h.id)
+when matched then
+  update set dr.shape_id = 410;
